@@ -252,6 +252,63 @@ window.populateInsightsFrom = async function (data) {
       'https://endearing-genie-16371b.netlify.app/.netlify/functions/insights'
     ];
 
+    <script>
+/* Draw the Trends chart after you click "Use Live Data" (no libraries). */
+(function(){
+  const btn = document.getElementById('liveBtn');
+  if(!btn) return;
+
+  // Add an extra handler (keeps your current one). It fetches and draws the chart.
+  btn.addEventListener('click', async ()=>{
+    const urls = [
+      '/.netlify/functions/insights',
+      'https://qr1.tech/.netlify/functions/insights',
+      'https://endearing-genie-16371b.netlify.app/.netlify/functions/insights'
+    ];
+
+    let data = null;
+    for (const u of urls) {
+      try { const r = await fetch(u, { cache:'no-store' }); if (r.ok) { data = await r.json(); break; } } catch {}
+    }
+    if (!data) return;
+
+    // Find the "Trends" header and mount area
+    const heading = Array.from(document.querySelectorAll('h1,h2,h3,div'))
+      .find(el => (el.textContent || '').trim() === 'Trends');
+    if (!heading) return;
+
+    let mount = document.getElementById('trendSvg');
+    if (!mount) {
+      mount = document.createElement('div');
+      mount.id = 'trendSvg';
+      mount.style.padding = '8px 6px 12px';
+      heading.insertAdjacentElement('afterend', mount);
+    }
+
+    // Build a tiny inline SVG line chart
+    const days = Object.keys(data.byDay || {}).sort();
+    const vals = days.map(d => data.byDay[d]);
+    if (!days.length) { mount.innerHTML = '<div style="color:#64748B;font-size:12px">No data yet.</div>'; return; }
+
+    const W = Math.max(320, 60*(days.length-1) + 40), H = 220, P = 24;
+    const max = Math.max(...vals) || 1;
+    const X = i => P + (W - 2*P) * (i / Math.max(1, days.length-1));
+    const Y = v => H - P - (H - 2*P) * (v / max);
+
+    let d = '';
+    vals.forEach((v,i)=> d += (i ? ' L' : 'M') + X(i) + ' ' + Y(v));
+    const dots = vals.map((v,i)=> `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="#2563EB"/>`).join('');
+
+    mount.innerHTML =
+      `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+         <rect width="${W}" height="${H}" fill="#ffffff"/>
+         <path d="${d}" stroke="#2563EB" stroke-width="2" fill="none"/>
+         ${dots}
+       </svg>
+       <div style="font-size:12px;color:#64748B;margin-top:4px;">${days.join(' · ')}</div>`;
+  });
+})();
+</script>
     let data = null;
     for (const url of endpoints) {
       try {
