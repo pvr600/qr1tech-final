@@ -19,7 +19,58 @@
     .nav-link{border-radius:12px;padding:.5rem .75rem}
     .nav-link.active{background:#EAF2FF;color:#1E40AF}
   </style>
-</head>
+  <script>
+/* Add Trends chart automatically when live data loads — no extra HTML needed. */
+window.populateInsightsFrom = async function (data) {
+  // Cards
+  const best = Object.entries(data.byHour || {}).sort((a,b)=>b[1]-a[1])[0];
+  const tEl = document.getElementById('insightTime');
+  if (tEl) tEl.textContent = best ? `${best[0]}:00–${(Number(best[0])+1)%24}:00` : '—';
+
+  const top = Object.entries(data.byCity || {}).sort((a,b)=>b[1]-a[1])[0];
+  const cEl = document.getElementById('insightCity');
+  if (cEl) cEl.textContent = top ? `${top[0]} (${top[1]})` : '—';
+
+  // Ensure a canvas exists right under the "Trends" heading
+  function ensureCanvas() {
+    let cv = document.getElementById('chartTrends');
+    if (!cv) {
+      const heading = Array.from(document.querySelectorAll('h1,h2,h3,div'))
+        .find(el => (el.textContent || '').trim() === 'Trends');
+      if (heading) {
+        cv = document.createElement('canvas');
+        cv.id = 'chartTrends';
+        cv.className = 'mt-3';
+        heading.insertAdjacentElement('afterend', cv);
+      }
+    }
+    return cv;
+  }
+
+  function drawChart() {
+    const labels = Object.keys(data.byDay || {}).sort();
+    const cv = ensureCanvas();
+    if (!cv || !labels.length) return;
+
+    if (window.chartTrends) window.chartTrends.destroy();
+    window.chartTrends = new Chart(cv, {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Scans', data: labels.map(k => data.byDay[k]) }] },
+      options: { plugins: { legend: { display: false } }, elements: { line: { tension: .35 } } }
+    });
+  }
+
+  // Load Chart.js if it isn’t loaded yet, then draw
+  if (typeof Chart === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+    s.onload = drawChart;
+    document.head.appendChild(s);
+  } else {
+    drawChart();
+  }
+};
+</script></head>
 <body class="bg-[var(--bg)]">
 <header class="border-b border-[var(--border)] bg-white sticky top-0 z-40">
   <div class="container-lg flex items-center justify-between py-3">
