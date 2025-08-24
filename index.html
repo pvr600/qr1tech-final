@@ -493,5 +493,12 @@ document.addEventListener('click', async (e) => {
     .filter(c => /Trends/i.test((c.textContent || '')));
   if (boxes.length > 1) boxes.slice(1).forEach(b => b.remove());
 })();
-</script></body>
+</script><script>
+/* Remove any extra "Trends" panels so only the charted one remains */
+(function () {
+  const boxes = Array.from(document.querySelectorAll('.card'))
+    .filter(c => /Trends/i.test((c.textContent || '')));
+  if (boxes.length > 1) boxes.slice(1).forEach(b => b.remove());
+})();
+</script>/body>
 </html>
