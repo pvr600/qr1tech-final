@@ -114,6 +114,68 @@ window.populateInsightsFrom = async function (data) {
     drawChart();
   }
 };
+    <script>
+/* Add a Trends line chart without relying on where other code is.
+   This listens for clicks on the "Use Live Data" button anywhere on the page,
+   fetches the live insights, and draws an inline SVG chart below the buttons. */
+document.addEventListener('click', async (e) => {
+  if (!e.target || e.target.id !== 'liveBtn') return;
+
+  const urls = [
+    '/.netlify/functions/insights',
+    'https://qr1.tech/.netlify/functions/insights',
+    'https://endearing-genie-16371b.netlify.app/.netlify/functions/insights'
+  ];
+
+  let data = null;
+  for (const u of urls) {
+    try {
+      const r = await fetch(u, { cache: 'no-store' });
+      if (r.ok) { data = await r.json(); break; }
+    } catch {}
+  }
+  if (!data) { alert('Trend data not reachable.'); return; }
+
+  // Find the button area and create a mount right below it
+  const btn = document.getElementById('liveBtn');
+  const container = btn && btn.parentNode ? btn.parentNode : document.body;
+
+  let mount = document.getElementById('trendMount');
+  if (!mount) {
+    mount = document.createElement('div');
+    mount.id = 'trendMount';
+    mount.style.marginTop = '12px';
+    mount.style.border = '1px solid #E2E8F0';
+    mount.style.borderRadius = '12px';
+    mount.style.padding = '12px';
+    mount.style.background = '#fff';
+    container.insertAdjacentElement('afterend', mount);
+  }
+
+  const byDay = data.byDay || {};
+  const days = Object.keys(byDay).sort();
+  if (!days.length) { mount.innerHTML = '<div style="color:#64748B;font-size:12px">No data yet.</div>'; return; }
+  const vals = days.map(d => byDay[d]);
+
+  const W = Math.max(320, 60*(days.length-1) + 40), H = 220, P = 24;
+  const max = Math.max(...vals) || 1;
+  const X = i => P + (W - 2*P) * (i / Math.max(1, days.length-1));
+  const Y = v => H - P - (H - 2*P) * (v / max);
+
+  let d = '';
+  vals.forEach((v,i)=> d += (i ? ' L' : 'M') + X(i) + ' ' + Y(v));
+  const dots = vals.map((v,i)=> `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="#2563EB"/>`).join('');
+
+  mount.innerHTML =
+    `<div style="font-weight:600;margin-bottom:6px">Trends</div>
+     <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+       <rect width="${W}" height="${H}" fill="#ffffff"/>
+       <path d="${d}" stroke="#2563EB" stroke-width="2" fill="none"/>
+       ${dots}
+     </svg>
+     <div style="font-size:12px;color:#64748B;margin-top:4px;">${days.join(' · ')}</div>`;
+});
+</script>
 </script></head>
 <body class="bg-[var(--bg)]">
 <header class="border-b border-[var(--border)] bg-white sticky top-0 z-40">
