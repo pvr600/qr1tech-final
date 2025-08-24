@@ -1,7 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <script>
+/* Draw the Trends chart as inline SVG (no extra library needed). */
+(function () {
+  // Keep any existing populateInsightsFrom but add chart drawing.
+  const _old = window.populateInsightsFrom;
+  window.populateInsightsFrom = function (data) {
+    if (typeof _old === 'function') { try { _old(data); } catch(e){} }
+
+    // Ensure we have a place to draw just under the "Trends" heading
+    let heading = Array.from(document.querySelectorAll('h1,h2,h3,div'))
+      .find(el => (el.textContent || '').trim() === 'Trends');
+    if (!heading) return;
+
+    let mount = document.getElementById('trendSvg');
+    if (!mount) {
+      mount = document.createElement('div');
+      mount.id = 'trendSvg';
+      mount.style.padding = '8px 6px 12px';
+      heading.insertAdjacentElement('afterend', mount);
+    }
+
+    const byDay = data.byDay || {};
+    const days = Object.keys(byDay).sort();
+    const vals = days.map(d => byDay[d]);
+    if (!days.length) { mount.innerHTML = '<div style="color:#64748B;font-size:12px">No data yet.</div>'; return; }
+
+    const W = Math.max(300, 60*(days.length-1) + 40), H = 220, P = 24;
+    const max = Math.max(...vals), min = 0;
+    const X = i => P + (W - 2*P) * (i / Math.max(1, days.length-1));
+    const Y = v => H - P - (H - 2*P) * ((v - min) / Math.max(1, max - min));
+
+    let path = '';
+    vals.forEach((v,i)=> path += (i ? ' L' : 'M') + X(i) + ' ' + Y(v));
+    const dots = vals.map((v,i)=> `<circle cx="${X(i)}" cy="${Y(v)}" r="3"/>`).join('');
+
+    mount.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+        <rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>
+        <path d="${path}" fill="none" stroke="#2563EB" stroke-width="2"/>
+        ${dots}
+      </svg>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">${days.join(' · ')}</div>`;
+  };
+})();
+</script>  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR1.tech — Create & Track Beautiful QR Codes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
