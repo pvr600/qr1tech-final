@@ -138,6 +138,42 @@
     });
     populateInsightsFrom({byHour,byDay,byCity});
   });
-</script>
-</body>
+</script><script>
+/* Replace the Live Data button handler with a more reliable one that
+   tries your custom domain and your Netlify subdomain as fallbacks. */
+(function () {
+  let btn = document.getElementById('liveBtn');
+  if (!btn) return;
+
+  // Remove any old handlers by cloning the button
+  const clone = btn.cloneNode(true);
+  btn.parentNode.replaceChild(clone, btn);
+  btn = clone;
+
+  btn.addEventListener('click', async () => {
+    const endpoints = [
+      '/.netlify/functions/insights',
+      'https://qr1.tech/.netlify/functions/insights',
+      'https://endearing-genie-16371b.netlify.app/.netlify/functions/insights'
+    ];
+
+    let data = null;
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) { data = await res.json(); break; }
+      } catch {}
+    }
+
+    if (!data) {
+      alert('Live data endpoint unreachable.');
+      return;
+    }
+
+    if (typeof populateInsightsFrom === 'function') {
+      populateInsightsFrom(data);
+    }
+  });
+})();
+</script></body>
 </html>
