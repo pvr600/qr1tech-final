@@ -8,633 +8,136 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              bg: '#F8FAFC',
-              panel: '#FFFFFF',
-              border: '#E2E8F0',
-              text: '#0F172A',
-              mute: '#64748B',
-              primary: '#2563EB',
-              primaryLight: '#3B82F6'
-            }
-          },
-          boxShadow: { soft: '0 10px 20px rgba(15, 23, 42, 0.06)' },
-          borderRadius: { '2xl': '1rem' }
-        }
-      }
-    }
-  </script>
-  <style>
-    :root{
-      --bg:#F8FAFC; --panel:#FFFFFF; --border:#E2E8F0; --text:#0F172A; --mute:#64748B;
-    }
-    html,body{height:100%;font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif; color: var(--text);}
-    .container-lg{max-width:1100px;margin:0 auto;padding:0 1rem}
-    .nav-link{border-radius:12px; padding:.5rem .75rem}
-    .nav-link.active{background:#EAF2FF;color:#1E40AF}
-    .chip{border:1px solid var(--border);background: #fff;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;color:#334155}
-    .palette button{width:36px;height:36px;border-radius:10px;border:2px solid #fff;outline:2px solid var(--border)}
-    .card{background:var(--panel);border:1px solid var(--border);box-shadow:0 10px 20px rgba(15,23,42,.06);border-radius:1rem}
-    .tidy p,.tidy li{line-height:1.6}
-    .tidy h1{font-size:1.6rem;font-weight:700}
-    .tidy h2{font-size:1.25rem;font-weight:600}
-    .tidy h3{font-size:1.05rem;font-weight:600}
-    .tidy .lede{color:var(--mute)}
-    .grid-2{display:grid;grid-template-columns:1fr;gap:1rem}
-    @media (min-width: 1024px){.grid-2{grid-template-columns: 1.1fr .9fr}}
-    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border-radius:12px;font-weight:600;border:1px solid var(--border);background:#fff}
-    .btn-primary{border-color:#1D4ED8;background:linear-gradient(180deg,#2563EB,#1D4ED8);color:#fff}
-    .btn-ghost{background:transparent}
-    .btn:active{transform:translateY(1px)}
-    .kbd{border:1px solid var(--border); background:#fff; padding:.2rem .4rem; border-radius:6px}
-    .hidden{display:none}
-    .template-surface{max-width:780px;margin:0 auto;padding:24px}
-    .template-card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 20px rgba(15,23,42,.06);overflow:hidden}
-    .avatar{width:68px;height:68px;border-radius:50%;background:#E2E8F0}
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+  <style>
+    :root{--bg:#F8FAFC;--panel:#FFFFFF;--border:#E2E8F0;--text:#0F172A;--mute:#64748B}
+    html,body{height:100%;font-family:Roboto,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text)}
+    .container-lg{max-width:1100px;margin:0 auto;padding:0 1rem}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 20px rgba(15,23,42,.06)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:600}
+    .btn.btn-primary{background:#2563EB;color:#fff;border-color:#1D4ED8}
+    .nav-link{border-radius:12px;padding:.5rem .75rem}
+    .nav-link.active{background:#EAF2FF;color:#1E40AF}
+  </style>
 </head>
 <body class="bg-[var(--bg)]">
-  <header class="border-b border-brand-border/80 bg-white sticky top-0 z-40">
-    <div class="container-lg flex items-center justify-between py-3">
-      <a href="#/home" class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-2xl bg-[#F8FBFF] border border-brand-border inline-grid place-items-center text-brand-primary">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" stroke="#2563EB" stroke-width="2"/><circle cx="8.5" cy="8.5" r="2.2" fill="#2563EB"/><circle cx="15.5" cy="8.5" r="2.2" fill="#2563EB"/><circle cx="8.5" cy="15.5" r="2.2" fill="#2563EB"/></svg>
-        </div>
-        <div>
-          <div class="text-sm tracking-wide text-brand-mute">qr1.tech</div>
-          <div class="font-semibold text-brand-text leading-4">Create & Track Beautiful QR Codes</div>
-        </div>
-      </a>
-      <nav class="flex items-center gap-1">
-        <a data-nav="#/home" class="nav-link">Home</a>
-        <a data-nav="#/builder" class="nav-link">Create QR</a>
-        <a data-nav="#/templates" class="nav-link">Templates</a>
-        <a data-nav="#/track" class="nav-link">Track Scans</a>
-        <a data-nav="#/insights" class="nav-link">AI Insights</a>
-        <a href="#/examples" class="ml-2 nav-link">See Examples</a>
-        <a href="#/builder" class="ml-4 btn btn-primary">Create QR Code</a>
-      </nav>
+<header class="border-b border-[var(--border)] bg-white sticky top-0 z-40">
+  <div class="container-lg flex items-center justify-between py-3">
+    <a href="#/home" class="flex items-center gap-3">
+      <div class="text-sm tracking-wide text-[var(--mute)]">qr1.tech</div>
+      <div class="font-semibold leading-4">Create & Track Beautiful QR Codes</div>
+    </a>
+    <nav class="flex items-center gap-1">
+      <a data-nav="#/home" class="nav-link">Home</a>
+      <a data-nav="#/builder" class="nav-link">Create QR</a>
+      <a data-nav="#/templates" class="nav-link">Templates</a>
+      <a data-nav="#/track" class="nav-link">Track Scans</a>
+      <a data-nav="#/insights" class="nav-link">AI Insights</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-lg py-8">
+  <section id="page-insights" data-page>
+    <h2 class="text-2xl font-semibold">AI‑Powered Insights</h2>
+    <p class="text-[var(--mute)] text-sm mt-1">Use live server data or upload a CSV.</p>
+    <div class="mt-3 flex gap-2 flex-wrap">
+      <button id="liveBtn" class="btn btn-primary">Use Live Data</button>
+      <a class="btn" href="/.netlify/functions/export-csv">Download CSV</a>
     </div>
-  </header>
 
-  <main>
-    <section id="page-home" data-page class="container-lg py-10">
-      <div class="grid lg:grid-cols-[1.1fr_.9fr] gap-6 items-center">
-        <div>
-          <h1 class="text-3xl font-bold">Create & Track Beautiful QR Codes.</h1>
-          <p class="text-brand-mute mt-2">Rounded-dot codes, curated palettes, Roboto, neat spacing. Analytics are real — scans log to server storage.</p>
-          <div class="flex gap-3 mt-6">
-            <a href="#/builder" class="btn btn-primary">Create QR Code</a>
-            <a href="#/examples" class="btn">See What You Can Create</a>
-          </div>
-          <div class="mt-6 flex items-center gap-2 text-sm text-brand-mute">
-            <span class="chip">Rounded dots</span>
-            <span class="chip">Curated colors</span>
-            <span class="chip">Scan analytics</span>
-            <span class="chip">AI insights</span>
-          </div>
-        </div>
-        <div class="card p-6" id="hero-qr">
-          <div id="heroQrCanvas" class="mx-auto"></div>
-          <p class="text-center text-sm text-brand-mute mt-4">Preview of our rounded-dot style.</p>
-        </div>
+    <div class="grid md:grid-cols-2 gap-4 mt-5">
+      <div class="card p-4">
+        <div class="text-sm text-[var(--mute)]">Best Time to Post</div>
+        <div id="insightTime" class="mt-2 font-semibold">—</div>
       </div>
-      <div class="mt-10 grid md:grid-cols-3 gap-4">
-        <div class="card p-5">
-          <h3 class="font-semibold">Clean Templates</h3>
-          <p class="text-brand-mute mt-1">Five tasteful variants for vCard, Wi‑Fi, Product, Event, Menu, Letter.</p>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Curated Palette</h3>
-          <p class="text-brand-mute mt-1">Brand-safe colors only — protect your aesthetic.</p>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Real Analytics</h3>
-          <p class="text-brand-mute mt-1">Server logs every scan with city (when available), device, time, and campaign.</p>
-        </div>
+      <div class="card p-4">
+        <div class="text-sm text-[var(--mute)]">Top City</div>
+        <div id="insightCity" class="mt-2 font-semibold">—</div>
       </div>
-    </section>
+    </div>
 
-    <section id="page-builder" data-page class="container-lg py-8 hidden">
-      <div class="grid-2">
-        <div class="card p-6">
-          <h2 class="text-xl font-semibold">1) Choose Content</h2>
-          <div class="grid md:grid-cols-2 gap-4 mt-4">
-            <label class="block">
-              <span class="text-sm text-brand-mute">Use‑case</span>
-              <select id="useCase" class="mt-1 w-full border border-brand-border rounded-xl p-2">
-                <option value="vcard">Business Card (vCard)</option>
-                <option value="wifi">Wi‑Fi</option>
-                <option value="product">Product Info</option>
-                <option value="event">Event</option>
-                <option value="menu">Menu</option>
-                <option value="letter">Letter / Note</option>
-              </select>
-            </label>
-            <label class="block">
-              <span class="text-sm text-brand-mute">Template Variant</span>
-              <select id="variant" class="mt-1 w-full border border-brand-border rounded-xl p-2">
-                <option value="clean">Clean</option>
-                <option value="badge">Badge</option>
-                <option value="split">Split</option>
-                <option value="photo-left">Photo Left</option>
-                <option value="centered">Centered</option>
-              </select>
-            </label>
-          </div>
+    <div class="card p-5 mt-4">
+      <h3 class="font-semibold">Trends</h3>
+      <canvas id="chartTrends" class="mt-3"></canvas>
+    </div>
 
-          <div id="formFields" class="mt-4 grid md:grid-cols-2 gap-3"></div>
-
-          <div class="mt-6">
-            <h2 class="text-xl font-semibold">2) Choose Style</h2>
-            <div class="mt-2 grid sm:grid-cols-2 gap-4">
-              <div class="card p-4">
-                <div class="text-sm text-brand-mute">QR Colors</div>
-                <div class="palette mt-2 flex gap-2 flex-wrap" id="palette"></div>
-                <div class="mt-3 text-sm text-brand-mute">Background</div>
-                <div class="palette mt-2 flex gap-2 flex-wrap" id="bgPalette"></div>
-                <div class="mt-3 text-sm">Module style: <span class="chip">rounded dots</span> (fixed)</div>
-                <div class="mt-2 text-sm">Font: <span class="chip">Roboto</span> (fixed)</div>
-              </div>
-              <div class="card p-4">
-                <div class="text-sm text-brand-mute">Campaign Label</div>
-                <input id="campaign" class="mt-2 w-full border border-brand-border rounded-xl p-2" placeholder="e.g. Winter Menu 2025" />
-                <div class="text-sm text-brand-mute mt-3">Short Description (optional)</div>
-                <input id="desc" class="mt-2 w-full border border-brand-border rounded-xl p-2" placeholder="Internal note" />
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6 flex gap-3">
-            <button id="btnPublish" class="btn btn-primary">Publish & Generate QR</button>
-            <button id="btnReset" class="btn">Reset</button>
-          </div>
-        </div>
-
-        <div class="card p-6">
-          <h2 class="text-xl font-semibold">Preview</h2>
-          <div class="grid gap-4 mt-3">
-            <div class="p-4 border border-brand-border rounded-2xl">
-              <div id="qrPreview" class="mx-auto"></div>
-              <div class="flex gap-2 mt-3">
-                <button id="btnDownloadPng" class="btn">Download PNG</button>
-                <button id="btnDownloadSvg" class="btn">Download SVG</button>
-                <button id="btnCopyUrl" class="btn">Copy URL</button>
-              </div>
-            </div>
-            <div class="p-4 border border-brand-border rounded-2xl">
-              <div class="text-sm text-brand-mute mb-2">Landing Preview</div>
-              <iframe id="landingPreview" class="w-full h-[420px] border border-brand-border rounded-xl"></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="page-templates" data-page class="container-lg py-8 hidden">
-      <h2 class="text-2xl font-semibold">Template Gallery</h2>
-      <p class="text-brand-mute mt-1">Five tasteful layout options for every use‑case. Click any card to pre‑fill the builder.</p>
-      <div id="templateGallery" class="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </section>
-
-    <section id="page-track" data-page class="container-lg py-8 hidden">
-      <div class="grid lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 card p-5">
-          <h2 class="text-xl font-semibold">Scan Activity</h2>
-          <canvas id="chartScans" class="mt-4"></canvas>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Device Mix</h3>
-          <canvas id="chartDevices" class="mt-4"></canvas>
-        </div>
-      </div>
-      <div class="grid lg:grid-cols-3 gap-4 mt-4">
-        <div class="card p-5">
-          <h3 class="font-semibold">Top Cities</h3>
-          <ul id="topCities" class="mt-3 space-y-2 text-sm"></ul>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Top Campaigns</h3>
-          <ul id="topCampaigns" class="mt-3 space-y-2 text-sm"></ul>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Recent Scans</h3>
-          <div id="recentScans" class="mt-3 text-sm"></div>
-        </div>
-      </div>
-      <p class="text-xs text-brand-mute mt-4">This dashboard reads live data from server storage.</p>
-    </section>
-
-    <section id="page-insights" data-page class="container-lg py-8 hidden">
-      <div class="grid lg:grid-cols-3 gap-4">
-        <div class="card p-5 lg:col-span-2">
-          <h2 class="text-xl font-semibold">AI‑Powered Insights (Local)</h2>
-          <p class="text-brand-mute text-sm mt-1">Drop a CSV of your scan logs (timestamp, city, device, campaign) to compute highlights.</p>
-          <label class="block mt-4">
-            <span class="text-sm">Upload CSV</span>
-            <input id="csvInput" type="file" accept=".csv" class="mt-2 w-full border border-brand-border rounded-xl p-2" />
-          </label>
-          <div class="grid md:grid-cols-2 gap-4 mt-4">
-            <div class="card p-4">
-              <div class="text-sm text-brand-mute">Best Time to Post</div>
-              <div id="insightTime" class="mt-2 font-semibold">—</div>
-            </div>
-            <div class="card p-4">
-              <div class="text-sm text-brand-mute">Top City</div>
-              <div id="insightCity" class="mt-2 font-semibold">—</div>
-            </div>
-          </div>
-          <div class="card p-5 mt-4">
-            <h3 class="font-semibold">Trends</h3>
-            <canvas id="chartTrends" class="mt-3"></canvas>
-          </div>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-semibold">Ask</h3>
-          <input id="askInput" placeholder="e.g. When are scans strongest?" class="w-full border border-brand-border rounded-xl p-2" />
-          <button id="askBtn" class="btn btn-primary mt-2">Analyze</button>
-          <div id="askOut" class="text-sm mt-3"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="page-examples" data-page class="container-lg py-8 hidden">
-      <h2 class="text-2xl font-semibold">See What You Can Create</h2>
-      <p class="text-brand-mute mt-1">Static thumbnails — no people, just abstract placeholders.</p>
-      <div class="grid md:grid-cols-2 gap-4 mt-4">
-        <div class="card p-4">
-          <svg viewBox="0 0 1200 800" class="rounded-xl" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="g1" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#F8FBFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient></defs>
-            <rect width="1200" height="800" fill="url(#g1)"/>
-            <g fill="#2563EB" opacity="0.12"><circle cx="200" cy="200" r="120"/><circle cx="980" cy="620" r="160"/><rect x="520" y="340" width="160" height="160" rx="20"/></g>
-            <text x="600" y="420" text-anchor="middle" font-family="Roboto, Arial" font-size="48" fill="#64748B">Minimal business card</text>
-          </svg>
-          <div class="text-sm mt-2 text-brand-mute">Minimal business card</div>
-        </div>
-        <div class="card p-4">
-          <svg viewBox="0 0 1200 800" class="rounded-xl" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="g2" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#F8FBFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient></defs>
-            <rect width="1200" height="800" fill="url(#g2)"/>
-            <g fill="#2563EB" opacity="0.12"><circle cx="260" cy="580" r="140"/><circle cx="920" cy="200" r="140"/><rect x="520" y="320" width="160" height="160" rx="20"/></g>
-            <text x="600" y="420" text-anchor="middle" font-family="Roboto, Arial" font-size="48" fill="#64748B">Product info placard</text>
-          </svg>
-          <div class="text-sm mt-2 text-brand-mute">Product info placard</div>
-        </div>
-        <div class="card p-4">
-          <svg viewBox="0 0 1200 800" class="rounded-xl" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="g3" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#F8FBFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient></defs>
-            <rect width="1200" height="800" fill="url(#g3)"/>
-            <g fill="#2563EB" opacity="0.12"><circle cx="340" cy="280" r="120"/><circle cx="840" cy="540" r="180"/><rect x="520" y="360" width="160" height="160" rx="20"/></g>
-            <text x="600" y="420" text-anchor="middle" font-family="Roboto, Arial" font-size="48" fill="#64748B">Event access pass</text>
-          </svg>
-          <div class="text-sm mt-2 text-brand-mute">Event access pass</div>
-        </div>
-        <div class="card p-4">
-          <svg viewBox="0 0 1200 800" class="rounded-xl" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="g4" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#F8FBFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient></defs>
-            <rect width="1200" height="800" fill="url(#g4)"/>
-            <g fill="#2563EB" opacity="0.12"><circle cx="240" cy="520" r="150"/><circle cx="980" cy="240" r="150"/><rect x="520" y="320" width="160" height="160" rx="20"/></g>
-            <text x="600" y="420" text-anchor="middle" font-family="Roboto, Arial" font-size="48" fill="#64748B">Restaurant menu card</text>
-          </svg>
-          <div class="text-sm mt-2 text-brand-mute">Restaurant menu card</div>
-        </div>
-      </div>
-    </section>
-
-    <section id="page-view" data-page class="py-8 hidden">
-      <div class="template-surface">
-        <div id="viewMount"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="mt-10 border-t border-brand-border/80 py-6">
-    <div class="container-lg text-sm text-brand-mute">Lifetime membership is ad‑free.</div>
-  </footer>
+    <div class="card p-5 mt-4">
+      <h3 class="font-semibold">Upload CSV instead</h3>
+      <input id="csvInput" type="file" accept=".csv" class="w-full border border-[var(--border)] rounded-xl p-2" />
+      <div id="askOut" class="text-sm mt-3 text-[var(--mute)]">Upload or use live data to see insights.</div>
+    </div>
+  </section>
+</main>
 
 <script>
   const pages = Array.from(document.querySelectorAll('[data-page]'));
   const navLinks = Array.from(document.querySelectorAll('[data-nav]'));
-  function route(){
-    const hash = location.hash || '#/home';
-    pages.forEach(p=>p.classList.add('hidden'));
-    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
-    const pageId = 'page-'+(hash.split('?')[0].replace('#/',''));
-    const el = document.getElementById(pageId) || document.getElementById('page-home');
+  function route(){ pages.forEach(p=>p.classList.add('hidden'));
+    const hash = location.hash || '#/insights';
+    const pageId = 'page-'+hash.replace('#/','');
+    const el = document.getElementById(pageId) || document.getElementById('page-insights');
     el.classList.remove('hidden');
-    const nav = document.querySelector(`[data-nav="${hash.split('?')[0]}"]`);
+    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+    const nav = document.querySelector(`[data-nav="${hash}"]`);
     if(nav) nav.classList.add('active');
-    if(pageId==='page-view'){ renderViewer(); }
-    if(pageId==='page-track'){ renderTrack(); }
   }
   window.addEventListener('hashchange', route);
   navLinks.forEach(a=> a.href=a.dataset.nav);
+  route();
 
-  const PALETTE = ['#0F172A','#111827','#2563EB','#3B82F6','#1E40AF','#0EA5E9','#06B6D4','#0D9488','#10B981','#F59E0B','#EF4444','#64748B'];
-  const BGPALETTE = ['#FFFFFF','#F8FAFC','#F1F5F9','#E2E8F0','#F8FBFF'];
+  function populateInsightsFrom(data){
+    const best = Object.entries(data.byHour || {}).sort((a,b)=>b[1]-a[1])[0];
+    const tEl = document.getElementById('insightTime');
+    if (tEl) tEl.textContent = best ? `${best[0]}:00–${(Number(best[0])+1)%24}:00` : '—';
 
-  const SPECS = {
-    vcard:[
-      {id:'name', label:'Full Name', req:true},
-      {id:'title', label:'Title'},
-      {id:'org', label:'Company'},
-      {id:'phone', label:'Phone'},
-      {id:'email', label:'Email'},
-      {id:'web', label:'Website'}
-    ],
-    wifi:[
-      {id:'ssid', label:'SSID', req:true},
-      {id:'pass', label:'Password'},
-      {id:'type', label:'Security', type:'select', options:['WPA','WEP','nopass']}
-    ],
-    product:[
-      {id:'title', label:'Product Name', req:true},
-      {id:'sku', label:'SKU'},
-      {id:'price', label:'Price'},
-      {id:'desc', label:'Description'},
-      {id:'url', label:'More Info URL'}
-    ],
-    event:[
-      {id:'ename', label:'Event Name', req:true},
-      {id:'date', label:'Date'},
-      {id:'time', label:'Time'},
-      {id:'loc', label:'Location'},
-      {id:'note', label:'Note'}
-    ],
-    menu:[
-      {id:'rname', label:'Restaurant / Vendor', req:true},
-      {id:'item1', label:'Item 1'},
-      {id:'item2', label:'Item 2'},
-      {id:'item3', label:'Item 3'},
-      {id:'url', label:'Menu URL (optional)'}
-    ],
-    letter:[
-      {id:'heading', label:'Heading', req:true},
-      {id:'message', label:'Message (short)'},
-      {id:'from', label:'From'}
-    ]
-  };
-  const VARIANTS = ['clean','badge','split','photo-left','centered'];
+    const top = Object.entries(data.byCity || {}).sort((a,b)=>b[1]-a[1])[0];
+    const cEl = document.getElementById('insightCity');
+    if (cEl) cEl.textContent = top ? `${top[0]} (${top[1]})` : '—';
 
-  const formFields = document.getElementById('formFields');
-  const useCase = document.getElementById('useCase');
-  const variantSel = document.getElementById('variant');
-  function renderForm(){
-    formFields.innerHTML = '';
-    const spec = SPECS[useCase.value];
-    spec.forEach(s=>{
-      const wrap = document.createElement('label');
-      wrap.className='block';
-      wrap.innerHTML = `<span class="text-sm text-brand-mute">${s.label}${s.req?' *':''}</span>`;
-      let input;
-      if(s.type==='select'){
-        input=document.createElement('select');
-        input.className='mt-1 w-full border border-brand-border rounded-xl p-2';
-        s.options.forEach(o=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;input.appendChild(opt)});
-      } else {
-        input=document.createElement('input');
-        input.placeholder=s.label;
-        input.className='mt-1 w-full border border-brand-border rounded-xl p-2';
+    const labels = Object.keys(data.byDay || {}).sort();
+    const cv = document.getElementById('chartTrends');
+    if (cv && window.Chart) {
+      if (window.chartTrends) window.chartTrends.destroy();
+      window.chartTrends = new Chart(cv, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Scans', data: labels.map(k => data.byDay[k]) }] },
+        options: { plugins: { legend: { display: false } }, elements: { line: { tension: .35 } } }
+      });
+    }
+  }
+
+  (function attachLiveBtn(){
+    const btn = document.getElementById('liveBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/.netlify/functions/insights');
+        const data = await res.json();
+        populateInsightsFrom(data);
+      } catch {
+        alert('Could not load live data yet. Make a scan first on the Track page.');
       }
-      input.id='fld_'+s.id;
-      wrap.appendChild(input);
-      formFields.appendChild(wrap);
     });
-  }
-  useCase.addEventListener('change', ()=>{renderForm(); updateLandingPreview();});
-  variantSel.addEventListener('change', updateLandingPreview);
+  })();
 
-  const palWrap = document.getElementById('palette');
-  const bgPalWrap = document.getElementById('bgPalette');
-  let currentColor = '#2563EB';
-  let currentBg = '#FFFFFF';
-  function mountPalette(){
-    PALETTE.forEach(c=>{
-      const b=document.createElement('button');
-      b.style.background=c; b.title=c; b.addEventListener('click',()=>{currentColor=c; buildQR();});
-      palWrap.appendChild(b);
+  // Optional: simple CSV upload to compute the same insights client-side
+  document.getElementById('csvInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const text = await file.text();
+    const rows = text.trim().split('\n').slice(1).map(l=>{
+      const [ts,city,device,campaign] = l.split(',');
+      return { ts, city, device, campaign };
     });
-    BGPALETTE.forEach(c=>{
-      const b=document.createElement('button');
-      b.style.background=c; b.title=c; b.addEventListener('click',()=>{currentBg=c; buildQR(); updateLandingPreview();});
-      bgPalWrap.appendChild(b);
+    const byHour={},byDay={},byCity={};
+    rows.forEach(r=>{
+      const t = new Date(r.ts); const h=t.getHours();
+      byHour[h]=(byHour[h]||0)+1;
+      const d=r.ts.slice(0,10); byDay[d]=(byDay[d]||0)+1;
+      const c=r.city||'Unknown'; byCity[c]=(byCity[c]||0)+1;
     });
-  }
-
-  let qr = null; let qrUrl = location.origin + location.pathname + '#/view';
-  const qrMount = document.getElementById('qrPreview');
-  const heroMount = document.getElementById('heroQrCanvas');
-  function buildQR(url){
-    const data = url || qrUrl;
-    if(!qr){
-      qr = new QRCodeStyling({
-        width: 256, height:256,
-        type:'svg', data,
-        imageOptions:{hideBackgroundDots:true,imageSize:0},
-        dotsOptions:{type:'dots', color: currentColor},
-        backgroundOptions:{color: currentBg},
-        cornersSquareOptions:{type:'extra-rounded'},
-        cornersDotOptions:{type:'dot'}
-      });
-      qr.append(qrMount);
-    } else {
-      qr.update({data, dotsOptions:{color: currentColor}, backgroundOptions:{color: currentBg}});
-    }
-  }
-  function buildHeroQR(){
-    const hqr = new QRCodeStyling({width:200,height:200,type:'svg',data:'https://qr1.tech',dotsOptions:{type:'dots',color:'#2563EB'},backgroundOptions:{color:'#F8FBFF'},cornersSquareOptions:{type:'extra-rounded'},cornersDotOptions:{type:'dot'}});
-    hqr.append(heroMount);
-  }
-
-  const landingPreview = document.getElementById('landingPreview');
-  function currentFormData(){
-    const spec = SPECS[useCase.value];
-    const data = {type: useCase.value, variant: variantSel.value, color: currentColor, bg: currentBg, fields:{}};
-    spec.forEach(s=>{ const el=document.getElementById('fld_'+s.id); data.fields[s.id]= (el && el.value)||''; });
-    data.campaign = document.getElementById('campaign').value||'';
-    data.desc = document.getElementById('desc').value||'';
-    return data;
-  }
-  function encodeData(obj){ return LZString.compressToEncodedURIComponent(JSON.stringify(obj)); }
-  function previewUrl(){ return location.origin + location.pathname + '#/view?d=' + encodeData(currentFormData()); }
-  function updateLandingPreview(){ landingPreview.src = previewUrl(); buildQR(previewUrl()); }
-
-  document.getElementById('btnPublish').addEventListener('click', ()=>{ updateLandingPreview(); alert('Published to shareable URL (local encoding). Use Copy URL to share the link.'); });
-  document.getElementById('btnReset').addEventListener('click', ()=>{ renderForm(); updateLandingPreview(); });
-  document.getElementById('btnDownloadPng').addEventListener('click', ()=>{ qr && qr.download({name:'qr1-code', extension:'png'}); });
-  document.getElementById('btnDownloadSvg').addEventListener('click', ()=>{ qr && qr.download({name:'qr1-code', extension:'svg'}); });
-  document.getElementById('btnCopyUrl').addEventListener('click', async ()=>{ const url=previewUrl(); try{ await navigator.clipboard.writeText(url); alert('URL copied');}catch(e){ prompt('Copy URL:', url); } });
-
-  const templateGallery = document.getElementById('templateGallery');
-  function mountTemplates(){
-    const uses = Object.keys(SPECS);
-    templateGallery.innerHTML='';
-    uses.forEach(u=>{
-      VARIANTS.forEach(v=>{
-        const card=document.createElement('button');
-        card.className='card p-4 text-left hover:shadow-soft transition';
-        card.innerHTML = `<div class="text-xs text-brand-mute mb-1">${u.toUpperCase()} • ${v}</div><div class="h-[120px] rounded-xl border border-brand-border bg-[#F8FBFF] grid place-items-center">${iconTemplate()}</div>`;
-        card.addEventListener('click', ()=>{ useCase.value=u; renderForm(); variantSel.value=v; location.hash='#/builder'; updateLandingPreview(); });
-        templateGallery.appendChild(card);
-      })
-    })
-  }
-  function iconTemplate(){
-    return `<svg width="64" height="64" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="8" stroke="#E2E8F0" stroke-width="2"/><rect x="6" y="7" width="12" height="3" rx="1.5" fill="#2563EB"/><rect x="6" y="12" width="9" height="3" rx="1.5" fill="#64748B"/></svg>`
-  }
-
-  function renderViewer(){
-    const q = new URLSearchParams((location.hash.split('?')[1]||''));
-    const dataStr = q.get('d');
-    const mount = document.getElementById('viewMount');
-    mount.innerHTML='';
-    if(!dataStr){ mount.innerHTML='<div class="text-brand-mute">No content.</div>'; return; }
-    let obj; try{ obj = JSON.parse(LZString.decompressFromEncodedURIComponent(dataStr)); } catch(e){ mount.innerHTML='<div class="text-brand-mute">Failed to load.</div>'; return; }
-    const {type, variant, color, bg, fields} = obj;
-    const surface = document.createElement('div');
-    surface.className='template-card tidy';
-    const inner = document.createElement('div');
-    inner.className='p-6 md:p-8';
-
-    if(['badge','split'].includes(variant)){
-      const stripe=document.createElement('div');
-      stripe.style.background = color; stripe.style.height='6px';
-      stripe.className='w-full';
-      surface.appendChild(stripe);
-    }
-
-    if(type==='vcard'){ inner.innerHTML = renderVCard(fields, variant, color);
-    } else if(type==='wifi'){ inner.innerHTML = renderWiFi(fields, variant, color);
-    } else if(type==='product'){ inner.innerHTML = renderProduct(fields, variant, color);
-    } else if(type==='event'){ inner.innerHTML = renderEvent(fields, variant, color);
-    } else if(type==='menu'){ inner.innerHTML = renderMenu(fields, variant, color);
-    } else if(type==='letter'){ inner.innerHTML = renderLetter(fields, variant, color); }
-
-    surface.appendChild(inner);
-    mount.appendChild(surface);
-    window.scrollTo({top:0,behavior:'smooth'});
-
-    try {
-      const u = new URL('/.netlify/functions/log-scan', location.origin);
-      u.searchParams.set('campaign', obj.campaign || '');
-      u.searchParams.set('desc', obj.desc || '');
-      fetch(u.toString(), { method: 'GET', keepalive: true }).catch(()=>{});
-    } catch(e){}
-  }
-
-  function chip(txt){ return `<span class="chip">${txt}</span>` }
-  function renderVCard(f,v,c){
-    const head = `<div class="flex items-center gap-4 mb-4"><div class="avatar"></div><div><h1>${f.name||''}</h1><div class="lede">${f.title||''}${f.org? ' • '+f.org: ''}</div></div></div>`;
-    const body = `<div class="grid sm:grid-cols-2 gap-2"><div>${chip('Phone')} ${f.phone||''}</div><div>${chip('Email')} ${f.email||''}</div><div>${chip('Web')} ${f.web||''}</div></div>`;
-    return variantFrame(v,c, head+body);
-  }
-  function renderWiFi(f,v,c){
-    const head = `<h1>Connect to Wi‑Fi</h1><div class="lede">SSID: <b>${f.ssid||''}</b> • Security: ${f.type||'WPA'}</div>`;
-    const body = `<div class="mt-2">Password: <span class="kbd">${f.pass||''}</span></div>`;
-    return variantFrame(v,c, head+body);
-  }
-  function renderProduct(f,v,c){
-    const head = `<h1>${f.title||''}</h1><div class="lede">${f.sku? 'SKU '+f.sku+' • ': ''}${f.price? f.price: ''}</div>`;
-    const body = `<p class="mt-2">${(f.desc||'').slice(0,220)}</p>${f.url? `<a href="${f.url}" class="btn mt-3" target="_blank">View details</a>`:''}`;
-    return variantFrame(v,c, head+body);
-  }
-  function renderEvent(f,v,c){
-    const head = `<h1>${f.ename||''}</h1><div class="lede">${[f.date,f.time,f.loc].filter(Boolean).join(' • ')}</div>`;
-    const body = f.note? `<p class="mt-2">${f.note}</p>`: '';
-    return variantFrame(v,c, head+body);
-  }
-  function renderMenu(f,v,c){
-    const head = `<h1>${f.rname||''}</h1><div class="lede">Today’s Picks</div>`;
-    const items = [f.item1,f.item2,f.item3].filter(Boolean).map(i=>`<li>• ${i}</li>`).join('');
-    const body = `<ul class="mt-2">${items}</ul>${f.url? `<a class="btn mt-3" href="${f.url}" target="_blank">Full menu</a>`:''}`;
-    return variantFrame(v,c, head+body);
-  }
-  function renderLetter(f,v,c){
-    const head = `<h1>${f.heading||''}</h1><div class="lede">${f.from? 'From: '+f.from: ''}</div>`;
-    const body = `<p class="mt-2">${(f.message||'').slice(0,400)}</p>`;
-    return variantFrame(v,c, head+body);
-  }
-  function variantFrame(v,c, inner){
-    if(v==='clean'){ return `<div>${inner}</div>`; }
-    if(v==='badge'){ return `<div><div class="inline-flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full" style="background:${c}10;color:${c}"><span>QR1</span><span class="w-1.5 h-1.5 rounded-full" style="background:${c}"></span><span>Template</span></div><div class="mt-3">${inner}</div></div>` }
-    if(v==='split'){ return `<div class="grid md:grid-cols-[.8fr_1fr] gap-6"><div><div class="h-24 rounded-xl" style="background:${c}15"></div></div><div>${inner}</div></div>` }
-    if(v==='photo-left'){ return `<div class="grid md:grid-cols-[120px_1fr] gap-4"><div class="avatar"></div><div>${inner}</div></div>` }
-    if(v==='centered'){ return `<div class="text-center max-w-[620px] mx-auto">${inner}</div>` }
-    return `<div>${inner}</div>`
-  }
-
-  let chartScans, chartDevices, chartTrends;
-  async function renderTrack(){
-    try {
-      const res = await fetch('/.netlify/functions/stats');
-      if(!res.ok) throw new Error('stats failed');
-      const data = await res.json();
-      const labels = Object.keys(data.byDay).sort();
-      const ctx1=document.getElementById('chartScans');
-      chartScans && chartScans.destroy();
-      chartScans=new Chart(ctx1,{type:'line', data:{labels, datasets:[{label:'Scans', data:labels.map(k=>data.byDay[k])}]}, options:{plugins:{legend:{display:false}}, elements:{line:{tension:.35}}, scales:{y:{grid:{color:'#EEF2F7'}},x:{grid:{display:false}}}}});
-      const ctx2=document.getElementById('chartDevices');
-      chartDevices && chartDevices.destroy();
-      const devKeys = Object.keys(data.byDevice);
-      chartDevices=new Chart(ctx2,{type:'doughnut', data:{labels:devKeys, datasets:[{data:devKeys.map(k=>data.byDevice[k])}]}, options:{plugins:{legend:{position:'bottom'}}}});
-      const tc=document.getElementById('topCities'); tc.innerHTML='';
-      Object.entries(data.byCity).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c])=>{ const li=document.createElement('li'); li.innerHTML=`<div class="flex justify-between"><span>${n}</span><b>${c}</b></div>`; tc.appendChild(li) });
-      const tcam=document.getElementById('topCampaigns'); tcam.innerHTML='';
-      Object.entries(data.byCampaign).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c])=>{ const li=document.createElement('li'); li.innerHTML=`<div class="flex justify-between"><span>${n}</span><b>${c}</b></div>`; tcam.appendChild(li) });
-      const rs=document.getElementById('recentScans'); rs.innerHTML='';
-      (data.recent||[]).forEach(r=>{ const row=document.createElement('div'); row.className='flex justify-between border-b border-brand-border/60 py-1'; row.innerHTML=`<span>${r.ts}</span><span>${r.city||'—'}</span><span>${r.device}</span><span>${r.campaign||''}</span>`; rs.appendChild(row)})
-    } catch(e){
-      const c=document.getElementById('chartScans').getContext('2d');
-      c.font='14px Roboto'; c.fillText('No data yet. Publish a QR and scan it.', 10, 20);
-    }
-  }
-
-  document.getElementById('csvInput').addEventListener('change', (e)=>{
-    const f=e.target.files[0]; if(!f) return;
-    Papa.parse(f,{header:true,complete:res=>{
-      const rows = res.data.filter(r=>r.timestamp && r.city);
-      const byHour={}; const byCity={};
-      const trendDays={};
-      rows.forEach(r=>{
-        const t=new Date(r.timestamp);
-        const hr=t.getHours(); byHour[hr]=(byHour[hr]||0)+1;
-        const city=r.city.trim(); byCity[city]=(byCity[city]||0)+1;
-        const day=t.toISOString().slice(0,10); trendDays[day]=(trendDays[day]||0)+1;
-      });
-      const bestHour = Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
-      const topCity = Object.entries(byCity).sort((a,b)=>b[1]-a[1])[0];
-      document.getElementById('insightTime').textContent = bestHour? `${bestHour[0]}:00–${(+bestHour[0]+1)%24}:00`: '—';
-      document.getElementById('insightCity').textContent = topCity? `${topCity[0]} (${topCity[1]})`: '—';
-      const ctx=document.getElementById('chartTrends');
-      chartTrends && chartTrends.destroy();
-      const labels=Object.keys(trendDays).sort();
-      chartTrends=new Chart(ctx,{type:'line', data:{labels, datasets:[{label:'Scans', data:labels.map(k=>trendDays[k])}]}, options:{plugins:{legend:{display:false}}, elements:{line:{tension:.35}}, scales:{y:{grid:{color:'#EEF2F7'}},x:{grid:{display:false}}}}});
-    }});
+    populateInsightsFrom({byHour,byDay,byCity});
   });
-  document.getElementById('askBtn').addEventListener('click', ()=>{
-    const q=document.getElementById('askInput').value.toLowerCase();
-    let a='I analyzed your uploaded data. '; if(q.includes('time')) a+='Your strongest hour is shown under "Best Time to Post".'; else if(q.includes('city')) a+='Check "Top City" for where engagement peaks.'; else if(q.includes('device')) a+='Device mix appears on the Track page.'; else a+='See the cards and trend chart for highlights.'; document.getElementById('askOut').textContent=a;
-  });
-
-  function init(){
-    mountPalette();
-    renderForm();
-    buildQR();
-    buildHeroQR();
-    mountTemplates();
-    updateLandingPreview();
-    route();
-  }
-  init();
 </script>
 </body>
 </html>
