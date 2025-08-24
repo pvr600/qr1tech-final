@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR1.tech — Create & Track Beautiful QR Codes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--bg:#F8FAFC;--panel:#FFFFFF;--border:#E2E8F0;--text:#0F172A;--mute:#64748B}
+    html,body{height:100%;font-family:Roboto,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text)}
+    .container-lg{max-width:1100px;margin:0 auto;padding:0 1rem}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 20px rgba(15,23,42,.06)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:600}
+    .btn.btn-primary{background:#2563EB;color:#fff;border-color:#1D4ED8}
+    .nav-link{border-radius:12px;padding:.5rem .75rem}
+    .nav-link.active{background:#EAF2FF;color:#1E40AF}
+  </style>
+</head>
+<body class="bg-[var(--bg)]">
+<header class="border-b border-[var(--border)] bg-white sticky top-0 z-40">
+  <div class="container-lg flex items-center justify-between py-3">
+    <a href="#/home" class="flex items-center gap-3">
+      <div class="text-sm tracking-wide text-[var(--mute)]">qr1.tech</div>
+      <div class="font-semibold leading-4">Create & Track Beautiful QR Codes</div>
+    </a>
+    <nav class="flex items-center gap-1">
+      <a data-nav="#/home" class="nav-link">Home</a>
+      <a data-nav="#/builder" class="nav-link">Create QR</a>
+      <a data-nav="#/templates" class="nav-link">Templates</a>
+      <a data-nav="#/track" class="nav-link">Track Scans</a>
+      <a data-nav="#/insights" class="nav-link">AI Insights</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-lg py-8">
+  <section id="page-insights" data-page>
+    <h2 class="text-2xl font-semibold">AI‑Powered Insights</h2>
+    <p class="text-[var(--mute)] text-sm mt-1">Use live server data or upload a CSV.</p>
+    <div class="mt-3 flex gap-2 flex-wrap">
+      <button id="liveBtn" class="btn btn-primary">Use Live Data</button>
+      <a class="btn" href="/.netlify/functions/export-csv">Download CSV</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mt-5">
+      <div class="card p-4">
+        <div class="text-sm text-[var(--mute)]">Best Time to Post</div>
+        <div id="insightTime" class="mt-2 font-semibold">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-[var(--mute)]">Top City</div>
+        <div id="insightCity" class="mt-2 font-semibold">—</div>
+      </div>
+    </div>
+
+    <div class="card p-5 mt-4">
+      <h3 class="font-semibold">Trends</h3>
+      <canvas id="chartTrends" class="mt-3"></canvas>
+    </div>
+
+    <div class="card p-5 mt-4">
+      <h3 class="font-semibold">Upload CSV instead</h3>
+      <input id="csvInput" type="file" accept=".csv" class="w-full border border-[var(--border)] rounded-xl p-2" />
+      <div id="askOut" class="text-sm mt-3 text-[var(--mute)]">Upload or use live data to see insights.</div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const pages = Array.from(document.querySelectorAll('[data-page]'));
+  const navLinks = Array.from(document.querySelectorAll('[data-nav]'));
+  function route(){ pages.forEach(p=>p.classList.add('hidden'));
+    const hash = location.hash || '#/insights';
+    const pageId = 'page-'+hash.replace('#/','');
+    const el = document.getElementById(pageId) || document.getElementById('page-insights');
+    el.classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+    const nav = document.querySelector(`[data-nav="${hash}"]`);
+    if(nav) nav.classList.add('active');
+  }
+  window.addEventListener('hashchange', route);
+  navLinks.forEach(a=> a.href=a.dataset.nav);
+  route();
+
+  function populateInsightsFrom(data){
+    const best = Object.entries(data.byHour || {}).sort((a,b)=>b[1]-a[1])[0];
+    const tEl = document.getElementById('insightTime');
+    if (tEl) tEl.textContent = best ? `${best[0]}:00–${(Number(best[0])+1)%24}:00` : '—';
+
+    const top = Object.entries(data.byCity || {}).sort((a,b)=>b[1]-a[1])[0];
+    const cEl = document.getElementById('insightCity');
+    if (cEl) cEl.textContent = top ? `${top[0]} (${top[1]})` : '—';
+
+    const labels = Object.keys(data.byDay || {}).sort();
+    const cv = document.getElementById('chartTrends');
+    if (cv && window.Chart) {
+      if (window.chartTrends) window.chartTrends.destroy();
+      window.chartTrends = new Chart(cv, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Scans', data: labels.map(k => data.byDay[k]) }] },
+        options: { plugins: { legend: { display: false } }, elements: { line: { tension: .35 } } }
+      });
+    }
+  }
+
+  (function attachLiveBtn(){
+    const btn = document.getElementById('liveBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/.netlify/functions/insights');
+        const data = await res.json();
+        populateInsightsFrom(data);
+      } catch {
+        alert('Could not load live data yet. Make a scan first on the Track page.');
+      }
+    });
+  })();
+
+  // Optional: simple CSV upload to compute the same insights client-side
+  document.getElementById('csvInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const text = await file.text();
+    const rows = text.trim().split('\n').slice(1).map(l=>{
+      const [ts,city,device,campaign] = l.split(',');
+      return { ts, city, device, campaign };
+    });
+    const byHour={},byDay={},byCity={};
+    rows.forEach(r=>{
+      const t = new Date(r.ts); const h=t.getHours();
+      byHour[h]=(byHour[h]||0)+1;
+      const d=r.ts.slice(0,10); byDay[d]=(byDay[d]||0)+1;
+      const c=r.city||'Unknown'; byCity[c]=(byCity[c]||0)+1;
+    });
+    populateInsightsFrom({byHour,byDay,byCity});
+  });
+</script>
+</body>
+</html>
