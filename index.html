@@ -176,6 +176,97 @@ document.addEventListener('click', async (e) => {
      <div style="font-size:12px;color:#64748B;margin-top:4px;">${days.join(' · ')}</div>`;
 });
 </script>
+  <script>
+/* Force-replace the "Use Live Data" click so it never shows the old alert.
+   Works on load and whenever you navigate (#/insights). Draws an SVG trend line. */
+(function(){
+  async function fetchInsights(){
+    // Use your confirmed-working endpoint:
+    const r = await fetch('https://qr1.tech/.netlify/functions/insights', { cache:'no-store' });
+    if (!r.ok) throw new Error('insights failed');
+    return r.json();
+  }
+
+  function drawTrends(data){
+    // Find a place to show the chart: right under the buttons row
+    const btn = document.getElementById('liveBtn');
+    if (!btn || !btn.parentNode) return;
+    let mount = document.getElementById('trendMount');
+    if (!mount){
+      mount = document.createElement('div');
+      mount.id = 'trendMount';
+      mount.style.marginTop = '12px';
+      mount.style.border = '1px solid #E2E8F0';
+      mount.style.borderRadius = '12px';
+      mount.style.padding = '12px';
+      mount.style.background = '#fff';
+      btn.parentNode.insertAdjacentElement('afterend', mount);
+    }
+
+    const byDay = data.byDay || {};
+    const days = Object.keys(byDay).sort();
+    if (!days.length){ mount.innerHTML = '<div style="color:#64748B;font-size:12px">No data yet.</div>'; return; }
+    const vals = days.map(d => byDay[d]);
+
+    const W = Math.max(320, 60*(days.length-1)+40), H = 220, P = 24;
+    const max = Math.max(...vals) || 1;
+    const X = i => P + (W-2*P) * (i / Math.max(1, days.length-1));
+    const Y = v => H-P - (H-2*P) * (v / max);
+
+    let d = '';
+    vals.forEach((v,i)=> d += (i?' L':' M') + X(i) + ' ' + Y(v));
+    const dots = vals.map((v,i)=> `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="#2563EB"/>`).join('');
+
+    mount.innerHTML =
+      `<div style="font-weight:600;margin-bottom:6px">Trends</div>
+       <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+         <rect width="${W}" height="${H}" fill="#ffffff"/>
+         <path d="${d.trim()}" stroke="#2563EB" stroke-width="2" fill="none"/>
+         ${dots}
+       </svg>
+       <div style="font-size:12px;color:#64748B;margin-top:4px;">${days.join(' · ')}</div>`;
+  }
+
+  function updateCards(data){
+    const best = Object.entries(data.byHour||{}).sort((a,b)=>b[1]-a[1])[0];
+    const tEl = document.getElementById('insightTime');
+    if (tEl) tEl.textContent = best ? `${best[0]}:00–${(Number(best[0])+1)%24}:00` : '—';
+    const top = Object.entries(data.byCity||{}).sort((a,b)=>b[1]-a[1])[0];
+    const cEl = document.getElementById('insightCity');
+    if (cEl) cEl.textContent = top ? `${top[0]} (${top[1]})` : '—';
+  }
+
+  function attach(){
+    // Wait a tick for the Insights page to be visible
+    setTimeout(()=>{
+      const oldBtn = document.getElementById('liveBtn');
+      if (!oldBtn || !oldBtn.parentNode) return;
+
+      // Replace the button node to remove ANY old listeners
+      const btn = oldBtn.cloneNode(true);
+      oldBtn.parentNode.replaceChild(btn, oldBtn);
+
+      btn.addEventListener('click', async (ev)=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        try{
+          const data = await fetchInsights();
+          updateCards(data);
+          drawTrends(data);
+        }catch(e){
+          alert('Live data endpoint unreachable.');
+        }
+      }, true);
+    }, 50);
+  }
+
+  // Run on load and on route changes
+  window.addEventListener('DOMContentLoaded', attach);
+  window.addEventListener('hashchange', ()=>{
+    if (location.hash.startsWith('#/insights')) attach();
+  });
+})();
+</script>
 </script></head>
 <body class="bg-[var(--bg)]">
 <header class="border-b border-[var(--border)] bg-white sticky top-0 z-40">
