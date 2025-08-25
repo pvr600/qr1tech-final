@@ -517,5 +517,32 @@ document.addEventListener('click', async (e) => {
   });
 })();
 </script>
+  <script>
+(function () {
+  // Run the cleanup: keep only the first "Trends" card (the one with the chart)
+  function cleanTrends() {
+    const cards = Array.from(document.querySelectorAll('.card'))
+      .filter(c => (c.querySelector('h3')?.textContent || '').trim().toLowerCase() === 'trends');
+    // Hide all but the first one
+    cards.slice(1).forEach(c => c.style.display = 'none');
+  }
+
+  // Run once on load
+  document.addEventListener('DOMContentLoaded', cleanTrends);
+
+  // Run again after "Use Live Data" (it re-renders the section)
+  document.addEventListener('click', (e) => {
+    const txt = e.target.closest('button, a, [role="button"]')?.textContent?.toLowerCase() || '';
+    if (txt.includes('use live data')) {
+      setTimeout(cleanTrends, 400);
+      setTimeout(cleanTrends, 1000);
+    }
+  });
+
+  // Safety net: if the page mutates, re-apply
+  new MutationObserver(() => cleanTrends())
+    .observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>
