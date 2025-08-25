@@ -562,5 +562,37 @@ document.addEventListener('click', async (e) => {
     .observe(document.body, { childList: true, subtree: true });
 })();
 </script>
+  <script>
+(function () {
+  function keepOnlyRealTrends() {
+    const mount = document.getElementById('trendMount');
+    const keepCard = mount ? mount.closest('.card') : null;
+
+    // Find any card whose title reads "Trends" (h1–h5)
+    const cards = Array.from(document.querySelectorAll('.card')).filter(c => {
+      const t = (c.querySelector('h1,h2,h3,h4,h5')?.textContent || '').trim().toLowerCase();
+      return t === 'trends';
+    });
+
+    // Remove every Trends card that is not the one containing #trendMount
+    cards.forEach(c => { if (keepCard && c !== keepCard) c.remove(); });
+  }
+
+  document.addEventListener('DOMContentLoaded', keepOnlyRealTrends);
+
+  // When "Use Live Data" is clicked, the DOM updates—clean again
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button, a, [role="button"]');
+    const label = (btn?.textContent || '').toLowerCase();
+    if (label.includes('use live data')) {
+      setTimeout(keepOnlyRealTrends, 300);
+      setTimeout(keepOnlyRealTrends, 900);
+    }
+  });
+
+  // Safety: if anything else changes the DOM, re-apply
+  new MutationObserver(keepOnlyRealTrends).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>
