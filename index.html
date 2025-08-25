@@ -480,26 +480,25 @@ document.addEventListener('click', async (e) => {
     }
   });
 })();
-  <script>
-/* Remove any extra "Trends" panels so only the charted one remains */
-(function () {
-  const boxes = Array.from(document.querySelectorAll('.card'))
-    .filter(c => /Trends/i.test((c.textContent || '')));
-  if (boxes.length > 1) boxes.slice(1).forEach(b => b.remove());
-})();
-</script></script>
-(function () {
-  const boxes = Array.from(document.querySelectorAll('.card'))
-    .filter(c => /Trends/i.test((c.textContent || '')));
-  if (boxes.length > 1) boxes.slice(1).forEach(b => b.remove());
-})();
-</script><script>
-/* Remove any extra "Trends" panels so only the charted one remains */
-(function () {
-  const boxes = Array.from(document.querySelectorAll('.card'))
-    .filter(c => /Trends/i.test((c.textContent || '')));
-  if (boxes.length > 1) boxes.slice(1).forEach(b => b.remove());
-})();
+
+<!-- Keep only the Trends card that actually contains a chart -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Find all cards titled "Trends"
+  const trends = Array.from(document.querySelectorAll('.card'))
+    .filter(c => (c.querySelector('h3')?.textContent || '')
+      .trim().toLowerCase() === 'trends');
+
+  if (trends.length <= 1) return;
+
+  // Prefer the card that has a chart-like element inside
+  const withChart = trends.find(c =>
+    c.querySelector('canvas, svg, [data-chart], [data-rechart], [role="img"][aria-label*="chart"]')
+  );
+
+  const keep = withChart || trends[0];
+  trends.forEach(c => { if (c !== keep) c.remove(); });
+});
 </script>
 </body>
 </html>
