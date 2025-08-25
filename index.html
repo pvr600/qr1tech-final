@@ -482,14 +482,40 @@ document.addEventListener('click', async (e) => {
 })();
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const cards = Array.from(document.querySelectorAll('.card h3'))
-    .filter(h => (h.textContent || '').trim().toLowerCase() === 'trends')
-    .map(h => h.closest('.card'));
+(function () {
+  function norm(txt) { return (txt || '').trim().toLowerCase(); }
 
-  // Keep the first, remove the rest
-  cards.slice(1).forEach(c => c.remove());
-});
+  function cleanTrends() {
+    // Find all cards titled "Trends" (h2/h3/h4 just in case)
+    const heads = Array.from(document.querySelectorAll('.card h2, .card h3, .card h4'));
+    const cards = heads
+      .filter(h => norm(h.textContent) === 'trends')
+      .map(h => h.closest('.card'))
+      .filter(Boolean);
+
+    if (cards.length <= 1) return;
+
+    // Prefer the one that actually contains a chart-like element
+    const withChart = cards.find(c =>
+      c.querySelector('canvas, svg, [data-chart], [data-rechart], [role="img"][aria-label*="chart"]')
+    );
+
+    const keep = withChart || cards[0];
+    cards.forEach(c => { if (c !== keep) c.remove(); });
+  }
+
+  // Run now and whenever the DOM changes (e.g., after "Use Live Data")
+  document.addEventListener('DOMContentLoaded', cleanTrends);
+  new MutationObserver(cleanTrends).observe(document.body, { childList: true, subtree: true });
+
+  // Extra nudge after clicking the "Use Live Data" button
+  document.addEventListener('click', (e) => {
+    if (norm(e.target?.textContent).includes('use live data')) {
+      setTimeout(cleanTrends, 300);
+      setTimeout(cleanTrends, 1000);
+    }
+  });
+})();
 </script>
 </body>
 </html>
