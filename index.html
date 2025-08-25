@@ -519,27 +519,45 @@ document.addEventListener('click', async (e) => {
 </script>
   <script>
 (function () {
-  // Run the cleanup: keep only the first "Trends" card (the one with the chart)
+  // Keep only the first "Trends" card that actually contains a chart
   function cleanTrends() {
+    // Find any card whose heading *looks like* "Trends"
     const cards = Array.from(document.querySelectorAll('.card'))
-      .filter(c => (c.querySelector('h3')?.textContent || '').trim().toLowerCase() === 'trends');
-    // Hide all but the first one
-    cards.slice(1).forEach(c => c.style.display = 'none');
+      .filter(c => {
+        const head = c.querySelector('h1,h2,h3,h4,h5,[data-title],[class*="title"],[class*="heading"]');
+        const txt = (head?.textContent || '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toLowerCase();
+        return txt.startsWith('trends'); // tolerant match
+      });
+
+    if (cards.length <= 1) return;
+
+    // Prefer the one that actually has a chart-like element
+    const withChart =
+      cards.find(c =>
+        c.querySelector('canvas, svg, [data-chart], [data-rechart], [role="img"][aria-label*="chart"]')
+      ) || cards[0];
+
+    // Remove the rest (not just hide)
+    cards.forEach(c => { if (c !== withChart) c.remove(); });
   }
 
-  // Run once on load
+  // Run on first render
   document.addEventListener('DOMContentLoaded', cleanTrends);
 
-  // Run again after "Use Live Data" (it re-renders the section)
+  // Run again after clicking "Use Live Data" (it re-renders the section)
   document.addEventListener('click', (e) => {
-    const txt = e.target.closest('button, a, [role="button"]')?.textContent?.toLowerCase() || '';
-    if (txt.includes('use live data')) {
-      setTimeout(cleanTrends, 400);
-      setTimeout(cleanTrends, 1000);
+    const label = (e.target.closest('button,a,[role="button"]')?.textContent || '').toLowerCase();
+    if (label.includes('use live data')) {
+      setTimeout(cleanTrends, 300);
+      setTimeout(cleanTrends, 800);
+      setTimeout(cleanTrends, 1500);
     }
   });
 
-  // Safety net: if the page mutates, re-apply
+  // Safety net: if the DOM mutates later, re-apply automatically
   new MutationObserver(() => cleanTrends())
     .observe(document.body, { childList: true, subtree: true });
 })();
