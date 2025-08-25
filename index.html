@@ -481,23 +481,14 @@ document.addEventListener('click', async (e) => {
   });
 })();
 
-<!-- Keep only the Trends card that actually contains a chart -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Find all cards titled "Trends"
-  const trends = Array.from(document.querySelectorAll('.card'))
-    .filter(c => (c.querySelector('h3')?.textContent || '')
-      .trim().toLowerCase() === 'trends');
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = Array.from(document.querySelectorAll('.card h3'))
+    .filter(h => (h.textContent || '').trim().toLowerCase() === 'trends')
+    .map(h => h.closest('.card'));
 
-  if (trends.length <= 1) return;
-
-  // Prefer the card that has a chart-like element inside
-  const withChart = trends.find(c =>
-    c.querySelector('canvas, svg, [data-chart], [data-rechart], [role="img"][aria-label*="chart"]')
-  );
-
-  const keep = withChart || trends[0];
-  trends.forEach(c => { if (c !== keep) c.remove(); });
+  // Keep the first, remove the rest
+  cards.slice(1).forEach(c => c.remove());
 });
 </script>
 </body>
